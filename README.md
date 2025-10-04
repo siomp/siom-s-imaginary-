@@ -18,7 +18,7 @@ My personal drive to organize my life. Save, organize screenshots, tabs, notes, 
   --> start timer for everyhting i do --> boost productivity and deep work. 
   - **Roadmap:**
    
-   **timer /// name activity, add notes, files, pics, tags ///
-   visualize time spent and activities that consumed the most out of my time.**
+   **start timer /// end timer /// save activity: name activity, add notes, files, pics, tags ///
+   visualize time spent and activities that consumed the most out of my time /// save time
 
   # To install it run localhost.9900 on .html in your browser. 
