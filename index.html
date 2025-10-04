@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>siom's imaginary</title>
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+  body {
+            font-family: 'Times New Roman', Times, serif;
+            background: #000000;
+            color: #ffffff;
+            overflow-x: auto;
+            min-height: 100vh;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: -0.5px;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .memory-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 400;
+            transition: all 0.3s ease;
+        }
+
+        .memory-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .timer-bar {
+            position: fixed;
+            top: 80px;
+            left: 40px;
+            right: 40px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            z-index: 999;
+        }
+
+        .timer-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #ffffff, #00d4ff);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .timer-controls {
+            position: fixed;
+            top: 100px;
+            right: 40px;
+            z-index: 999;
+            display: flex;
+            gap: 10px;
+        }
+
+        .timer-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .timer-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .schedule-container {
+            margin-top: 140px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .days-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .day-tab {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .day-tab:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .day-tab.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+        }
+
+        .day-column {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+    padding: 20px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .day-column::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .day-column::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.1) 1px, transparent 0);
+            background-size: 20px 20px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .day-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+    text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+            position: relative;
+            z-index: 1;
+        }
+
+        .task-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        .task-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 60%),
+                        radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.03) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .task-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
+            background-size: 15px 15px;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .task-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .task-card.overdue {
+            background: rgba(255, 0, 0, 0.1);
+            border-color: rgba(255, 0, 0, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        .task-card.overdue::before {
+            content: "";
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 16px;
+            z-index: 2;
+        }
+
+        .task-card.completed {
+            opacity: 0.6;
+            transform: scale(0.98);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .task-time {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .task-title {
+            font-size: 14px;
+            font-weight: 400;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.9);
+            position: relative;
+            z-index: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .task-title:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .task-resources {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 4px;
+            border-radius: 4px;
+            resize: vertical;
+            min-height: 40px;
+            transition: all 0.2s ease;
+            font-style: italic;
+        }
+
+        .task-resources:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .task-toggle {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .task-toggle.active {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .task-toggle::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .task-toggle.active::before {
+            transform: translateX(26px);
+            background: #ffffff;
+        }
+
+        .upload-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .upload-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .file-upload {
+            display: none;
+        }
+
+        .file-list {
+            margin-top: 8px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .file-item {
+    display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+        }
+
+        .file-item button {
+            background: none;
+            border: none;
+            color: rgba(255, 0, 0, 0.7);
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .gym-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+    align-items: center;
+            z-index: 2000;
+        }
+
+        .gym-modal.show {
+            display: flex;
+        }
+
+        .gym-content {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .gym-content h2 {
+            margin-bottom: 20px;
+            color: #ff4444;
+        }
+
+        .pushup-counter {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #ffffff;
+        }
+
+        .gym-btn {
+            background: #ffffff;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            margin: 0 10px;
+        }
+
+        .gym-btn:hover {
+            background: #cccccc;
+        }
+
+        .gym-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .gym-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .edit-mode .task-title {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px;
+            border-radius: 4px;
+    outline: none;
+  }
+
+        .edit-mode .task-resources {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px;
+            border-radius: 4px;
+            outline: none;
+            min-height: 60px;
+            resize: vertical;
+        }
+
+        /* Memory Modal Styles */
+        .memory-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .memory-modal.show {
+            display: flex;
+        }
+
+        .memory-content {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 1200px;
+            height: 90%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .memory-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .memory-content::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.1) 1px, transparent 0);
+            background-size: 20px 20px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .memory-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .memory-header h2 {
+            font-size: 20px;
+            font-weight: 400;
+        }
+
+        .memory-close {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .memory-close:hover {
+            color: white;
+        }
+
+        .memory-body {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        .memory-sidebar {
+            width: 250px;
+            background: rgba(255, 255, 255, 0.02);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .memory-main {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .notes-section {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .notes-header .title {
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .notes-editor {
+            min-height: 140px;
+            padding: 10px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            outline: none;
+            white-space: pre-wrap;
+        }
+        .notes-hint {
+            margin-top: 6px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+        }
+        .add-task-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            margin: 0 auto 12px auto;
+            display: block;
+        }
+        .add-task-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .day-folder {
+            margin-bottom: 15px;
+        }
+
+        .day-folder-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .day-folder-header:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .day-folder-header.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .day-folder-name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .day-folder-count {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .memory-files {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .memory-file {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .memory-file:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .file-preview {
+            width: 100%;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .file-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .file-preview .file-icon {
+            font-size: 32px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .file-name {
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            word-break: break-word;
+        }
+
+        .file-size {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .file-actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: none;
+        }
+
+        .memory-file:hover .file-actions {
+            display: block;
+        }
+
+        .file-delete {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff4444;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .upload-area:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .memory-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .memory-empty .icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+  }
+</style>
+</head>
+<body>
+    <div class="header">
+        <h1>Personal Drive Schedule</h1>
+        <div class="header-controls">
+            <button class="memory-btn" onclick="openMemoryModal()">
+                Memories
+            </button>
+        </div>
+    </div>
+
+    <div class="timer-bar">
+        <div class="timer-progress" id="timerProgress"></div>
+    </div>
+
+    <div class="timer-controls">
+        <button class="timer-btn" onclick="startTimer()">Start</button>
+        <button class="timer-btn" onclick="pauseTimer()">Pause</button>
+        <button class="timer-btn" onclick="resetTimer()">Reset</button>
+        <span id="timerDisplay">00:00</span>
+    </div>
+
+    <div class="schedule-container" id="scheduleContainer">
+        <div class="days-bar" id="daysBar">
+            <!-- Day tabs will be generated here -->
+        </div>
+        <div class="day-column" id="currentDayColumn">
+            <!-- Current day tasks will be displayed here -->
+        </div>
+    </div>
+
+    <div class="gym-modal" id="gymModal">
+        <div class="gym-content">
+            <h2>⚠️ Overdue Task</h2>
+            <p>You have overdue tasks! Complete 10 push-ups to clear the red warning.</p>
+            <div class="pushup-counter" id="pushupCounter">0 / 10</div>
+            <button class="gym-btn" onclick="doPushup()">Push-up</button>
+            <button class="gym-btn secondary" onclick="closeGymModal()">Skip (Not Recommended)</button>
+        </div>
+    </div>
+
+    <!-- Memory Modal -->
+    <div class="memory-modal" id="memoryModal">
+        <div class="memory-content">
+            <div class="memory-header">
+                <h2>Memory</h2>
+                <button class="memory-close" onclick="closeMemoryModal()">×</button>
+            </div>
+            <div class="memory-body">
+                <div class="memory-sidebar">
+                    <div id="memoryFolders">
+                        <!-- Day folders will be generated here -->
+                    </div>
+                </div>
+                <div class="memory-main">
+                    <div class="notes-section">
+                        <div class="notes-header">
+                            <div class="title">Daily Notes</div>
+                            <div id="notesStatus" style="font-size:12px;color:rgba(255,255,255,0.5)">Saved</div>
+                        </div>
+                        <div id="notesEditor" class="notes-editor" contenteditable="true" placeholder="Type notes here. Paste images (⌘V) to save them to today's memory."></div>
+                        <div class="notes-hint">Tip: Paste screenshots; they will be auto-saved in the selected day.</div>
+                    </div>
+                    <div class="upload-area" id="uploadArea" onclick="triggerFileUpload()">
+                        <div class="upload-icon">📁</div>
+                        <div class="upload-text">Drop files here or click to upload</div>
+                    </div>
+                    <div class="memory-files" id="memoryFiles">
+                        <!-- Files will be displayed here -->
+                    </div>
+                    <div class="memory-empty" id="memoryEmpty" style="display: none;">
+                        <div class="icon">📂</div>
+                        <div>No memories for this day yet</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="memoryFileInput" multiple style="display: none;" onchange="handleMemoryFileUpload(event)">
+    <script>
+// Weekly Task Schedule Data (inlined to avoid file loading issues)
+const scheduleData = {
+  "schedule": [
+    {
+      "day": "monday",
+      "tasks": [
+        {"time": "5:00–6:00", "title": "Gym (strength + mobility)"},
+        {"time": "6:00–7:50", "title": "Math I / AIME prep", "resources": "MIT OCW 18.01 problem sets 1–2, Spivak Ch.1–3, MIT OCW lectures 1–3, PatrickJMT derivatives"},
+        {"time": "8:30–9:20", "title": "Calculus class"},
+        {"time": "9:30–11:00", "title": "Physics challenge problems", "resources": "David Morin Intro Physics Ch.1–2, rotational dynamics, energy conservation"},
+        {"time": "12:30–1:50", "title": "CS class", "resources": "Python basics / data structures"},
+        {"time": "2:00–2:15", "title": "Lunch"},
+        {"time": "2:20–4:30", "title": "Architecture portfolio", "resources": "Sketches + concept boards, CAD/Figma draft 1–2 pieces"},
+        {"time": "5:00–6:00", "title": "Gym (cardio + mobility)"},
+        {"time": "6:15–7:30", "title": "Python side project", "resources": "Automate the Boring Stuff, Ch.1–5, small project to model product data"},
+        {"time": "7:30–8:30", "title": "IDEA.ENV / Design portfolio"},
+        {"time": "8:30–9:30", "title": "Economics", "resources": "Perloff Micro, Ch.2–3, 5–10 problems"},
+        {"time": "9:30–10:00", "title": "Reflection / AIME log"}
+      ]
+    },
+    {
+      "day": "tuesday",
+      "tasks": [
+        {"time": "5:00–6:00", "title": "Gym"},
+        {"time": "6:00–7:50", "title": "Math: Calculus I + AIME", "resources": "MIT OCW problem sets 1–3, Spivak Ch.2 exercises, Professor Herbert Gross videos"},
+        {"time": "8:30–9:20", "title": "Calculus class"},
+        {"time": "9:30–10:30", "title": "Physics class + practice", "resources": "Morin Ch.3, multi-step kinematics"},
+        {"time": "12:30–1:50", "title": "Social Science"},
+        {"time": "2:00–2:15", "title": "Lunch"},
+        {"time": "2:20–4:20", "title": "Architecture portfolio / CAD"},
+        {"time": "3:30–4:35", "title": "Piano"},
+        {"time": "5:00–6:00", "title": "Gym"},
+        {"time": "6:15–7:30", "title": "Python: Functions & data structures exercises"},
+        {"time": "7:30–8:30", "title": "IDEA.ENV / Design portfolio"},
+        {"time": "8:30–9:30", "title": "Economics: Game Theory", "resources": "Perloff Ch.5, 3–5 practice problems"},
+        {"time": "9:30–10:00", "title": "Math review / mistakes log"}
+      ]
+    },
+    {
+      "day": "wednesday",
+      "tasks": [
+        {"time": "5:00–6:00", "title": "Gym"},
+        {"time": "6:00–9:20", "title": "Math I / AIME", "resources": "MIT OCW + past AIME problems, 10–15 challenging"},
+        {"time": "9:40–1:20", "title": "MIT Media Lab course"},
+        {"time": "1:20–1:50", "title": "Lunch"},
+        {"time": "2:00–4:00", "title": "Architecture / IDEA.ENV"},
+        {"time": "4:30–5:30", "title": "Gym"},
+        {"time": "5:45–7:00", "title": "CS / Python small project"},
+        {"time": "7:00–11:00", "title": "Optional Cram Session", "resources": "7–9 PM: Calculus I derivatives & limits; 9–11 PM: Economics micro hard exercises + policy application"}
+      ]
+    },
+    {
+      "day": "thursday",
+      "tasks": [
+        {"time": "5:00–6:00", "title": "Gym"},
+        {"time": "6:00–7:50", "title": "Calculus I / AIME: integration + substitution"},
+        {"time": "8:30–9:20", "title": "Calculus class"},
+        {"time": "9:30–10:30", "title": "Physics class + hard practice", "resources": "Morin Ch.4, rotational dynamics"},
+        {"time": "12:30–1:50", "title": "Social Science + Science"},
+        {"time": "2:00–2:15", "title": "Lunch"},
+        {"time": "2:20–3:20", "title": "Architecture portfolio / CAD"},
+        {"time": "3:30–4:30", "title": "CS class"},
+        {"time": "5:00–6:00", "title": "Gym"},
+        {"time": "6:15–7:30", "title": "Python / product modeling"},
+        {"time": "7:30–8:30", "title": "IDEA.ENV / Design portfolio"},
+        {"time": "8:30–9:30", "title": "Economics: Macro + Policy", "resources": "Perloff Ch.7"},
+        {"time": "9:30–10:00", "title": "Math review / mistakes log"}
+      ]
+    },
+    {
+      "day": "friday",
+      "tasks": [
+        {"time": "5:00–6:00", "title": "Gym"},
+        {"time": "6:00–7:50", "title": "Math: Calculus / AIME problem set"},
+        {"time": "8:30–9:20", "title": "Calculus class"},
+        {"time": "9:30–11:00", "title": "Physics advanced problem sets"},
+        {"time": "11:00–12:00", "title": "Economics: Micro review + game theory"},
+        {"time": "12:30–1:50", "title": "CS / Python"},
+        {"time": "2:00–2:15", "title": "Lunch"},
+        {"time": "2:20–4:30", "title": "Architecture portfolio deep work"},
+        {"time": "5:00–6:00", "title": "Gym"},
+        {"time": "6:15–7:30", "title": "IDEA.ENV / Design portfolio"},
+        {"time": "7:30–8:30", "title": "Economics / game theory review"},
+        {"time": "8:30–9:30", "title": "Python / side project"},
+        {"time": "9:30–10:00", "title": "Math reflection / mistakes log"},
+        {"time": "10:00–10:30", "title": "MIT Media Lab prep / tasks"}
+      ]
+    },
+    {
+      "day": "saturday",
+      "tasks": [
+        {"time": "5:00–7:00", "title": "Math mock test / AIME full-length"},
+        {"time": "7:00–8:00", "title": "Gym"},
+        {"time": "8:00–9:00", "title": "Physics advanced problems"},
+        {"time": "9:00–12:00", "title": "Architecture / Design portfolio deep work"},
+        {"time": "12:00–1:00", "title": "Lunch"},
+        {"time": "1:00–4:00", "title": "IDEA.ENV / outreach / Nubank prep"},
+        {"time": "4:00–6:00", "title": "CS / Python side projects"},
+        {"time": "6:00–7:00", "title": "Gym"},
+        {"time": "7:00–9:00", "title": "Economics review (Macro + Micro hard problems)"},
+        {"time": "9:00–11:00", "title": "Calculus I cram session (optional)", "resources": "Derivatives & limits"}
+      ]
+    },
+    {
+      "day": "sunday",
+      "tasks": [
+        {"time": "5:00–7:00", "title": "Math mock test / AIME full-length"},
+        {"time": "7:00–8:00", "title": "Gym"},
+        {"time": "8:00–9:00", "title": "Physics advanced problems"},
+        {"time": "9:00–12:00", "title": "Architecture / Design portfolio deep work"},
+        {"time": "12:00–1:00", "title": "Lunch"},
+        {"time": "1:00–4:00", "title": "IDEA.ENV / outreach / Nubank prep"},
+        {"time": "4:00–6:00", "title": "CS / Python side projects"},
+        {"time": "6:00–7:00", "title": "Gym"},
+        {"time": "7:00–9:00", "title": "Economics review (Macro + Micro hard problems)"},
+        {"time": "9:00–11:00", "title": "Calculus I cram session (optional)", "resources": "Derivatives & limits"}
+      ]
+    }
+  ]
+};
+    </script>
+    
+    <script>
+        let timerInterval = null;
+        let timerSeconds = 0;
+        let pushupCount = 0;
+        let overdueTasks = [];
+        let memoryData = {};
+        let currentMemoryDay = null;
+        let currentDay = null;
+        let taskPresets = {};
+        let currentTime = new Date();
+
+        // Timer functionality
+        function startTimer() {
+            if (timerInterval) return;
+            timerInterval = setInterval(() => {
+                timerSeconds++;
+                updateTimerDisplay();
+                updateTimerBar();
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            timerSeconds = 0;
+            updateTimerDisplay();
+            updateTimerBar();
+        }
+
+        function updateTimerDisplay() {
+            const hours = Math.floor(timerSeconds / 3600);
+            const minutes = Math.floor((timerSeconds % 3600) / 60);
+            const seconds = timerSeconds % 60;
+            document.getElementById('timerDisplay').textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateTimerBar() {
+            const maxSeconds = 8 * 3600; // 8 hours max
+            const progress = Math.min((timerSeconds / maxSeconds) * 100, 100);
+            document.getElementById('timerProgress').style.width = progress + '%';
+        }
+
+        // Gym penalty system
+        function doPushup() {
+            pushupCount++;
+            document.getElementById('pushupCounter').textContent = `${pushupCount} / 10`;
+            
+            if (pushupCount >= 10) {
+                clearOverdueTasks();
+                closeGymModal();
+            }
+        }
+
+        function clearOverdueTasks() {
+            overdueTasks.forEach(taskId => {
+                const taskCard = document.querySelector(`[data-task-id="${taskId}"]`);
+                if (taskCard) {
+                    taskCard.classList.remove('overdue');
+                }
+            });
+            overdueTasks = [];
+        }
+
+        function closeGymModal() {
+            document.getElementById('gymModal').classList.remove('show');
+            pushupCount = 0;
+        }
+
+        // Task management
+        function toggleTask(taskId) {
+            const taskCard = document.querySelector(`[data-task-id="${taskId}"]`);
+            const toggle = taskCard.querySelector('.task-toggle');
+            
+            // Find task in presets
+            let task = null;
+            for (let day in taskPresets) {
+                task = taskPresets[day].find(t => t.id === taskId);
+                if (task) break;
+            }
+            
+            if (task) {
+                task.completed = !task.completed;
+                saveTaskPresets();
+                
+                if (task.completed) {
+                    taskCard.classList.add('completed');
+                    toggle.classList.add('active');
+                    taskCard.classList.remove('overdue');
+                    const index = overdueTasks.indexOf(taskId);
+                    if (index > -1) {
+                        overdueTasks.splice(index, 1);
+                    }
+                } else {
+                    taskCard.classList.remove('completed');
+                    toggle.classList.remove('active');
+                    
+                    // Check if task is overdue
+                    const taskTime = taskCard.querySelector('.task-time').textContent;
+                    if (isTaskOverdue(taskTime)) {
+                        taskCard.classList.add('overdue');
+                        if (!overdueTasks.includes(taskId)) {
+                            overdueTasks.push(taskId);
+                        }
+                        showGymModal();
+                    }
+                }
+            }
+        }
+
+        function isTaskOverdue(taskTime) {
+            const now = new Date();
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            const [startTime, endTime] = taskTime.split('–');
+            const [startHour, startMin] = startTime.split(':').map(Number);
+            const taskStartTime = startHour * 60 + startMin;
+            
+            return currentTime > taskStartTime;
+        }
+
+        function showGymModal() {
+            document.getElementById('gymModal').classList.add('show');
+        }
+
+        function saveTask(taskId) {
+            const taskCard = document.querySelector(`[data-task-id="${taskId}"]`);
+            const titleElement = taskCard.querySelector('.task-title');
+            const resourcesElement = taskCard.querySelector('.task-resources');
+            
+            // Find task in presets and update
+            let task = null;
+            for (let day in taskPresets) {
+                task = taskPresets[day].find(t => t.id === taskId);
+                if (task) break;
+            }
+            
+            if (task) {
+                task.title = titleElement.textContent;
+                task.resources = resourcesElement.textContent;
+                saveTaskPresets();
+            }
+        }
+
+        function uploadFile(taskId) {
+            // Upload files to memory system for current day
+            if (currentDay) {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.multiple = true;
+                input.onchange = (e) => {
+                    const files = Array.from(e.target.files);
+                    addFilesToMemory(currentDay, files);
+                };
+                input.click();
+            }
+        }
+
+        function addFilesToMemory(day, files) {
+            if (!memoryData[day]) {
+                memoryData[day] = [];
+            }
+            
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const fileData = {
+                        name: file.name,
+                        type: file.type,
+                        size: file.size,
+                        url: e.target.result,
+                        date: new Date().toISOString()
+                    };
+                    
+                    memoryData[day].push(fileData);
+                    saveMemoryData();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Load task presets
+        function loadTaskPresets() {
+            const saved = localStorage.getItem('taskPresets');
+            if (saved) {
+                taskPresets = JSON.parse(saved);
+            } else {
+                // Initialize presets from schedule data
+                scheduleData.schedule.forEach(day => {
+                    taskPresets[day.day] = day.tasks.map(task => ({
+                        ...task,
+                        completed: false,
+                        id: `${day.day.toLowerCase()}-${Math.random().toString(36).substr(2, 9)}`
+                    }));
+                });
+                saveTaskPresets();
+            }
+        }
+
+        function saveTaskPresets() {
+            localStorage.setItem('taskPresets', JSON.stringify(taskPresets));
+        }
+
+        // Legacy no-op to avoid runtime errors during initialization
+        function loadFromStorage() {
+            // Intentionally left blank; kept for backward compatibility
+        }
+
+        // Get current day based on time
+        function getCurrentDay() {
+            const now = new Date();
+            const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+            return dayNames[now.getDay()];
+        }
+
+        // Get pending tasks for a specific day
+        function getPendingTasks(day) {
+            if (!taskPresets[day]) return [];
+            
+            const now = new Date();
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            
+            return taskPresets[day].filter(task => {
+                if (task.completed) return false;
+                
+                // Check if task time has passed
+                const [startTime, endTime] = task.time.split('–');
+                const [startHour, startMin] = startTime.split(':').map(Number);
+                const taskStartTime = startHour * 60 + startMin;
+                
+                return currentTime >= taskStartTime;
+            });
+        }
+
+        // Render day tabs
+        function renderDayTabs() {
+            const daysBar = document.getElementById('daysBar');
+            daysBar.innerHTML = '';
+            
+            scheduleData.schedule.forEach(day => {
+                const dayKey = day.day; // already lowercase in data
+                const label = dayKey.charAt(0).toUpperCase() + dayKey.slice(1);
+                const dayTab = document.createElement('div');
+                dayTab.className = 'day-tab';
+                dayTab.textContent = label;
+                dayTab.dataset.dayKey = dayKey;
+                dayTab.onclick = (e) => selectDay(dayKey, e.currentTarget);
+                
+                if (dayKey === getCurrentDay()) {
+                    dayTab.classList.add('active');
+                    currentDay = dayKey;
+                }
+                
+                daysBar.appendChild(dayTab);
+            });
+        }
+
+        // Select day and render tasks
+        function selectDay(dayKey, tabEl) {
+            currentDay = dayKey;
+            document.querySelectorAll('.day-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            if (tabEl) tabEl.classList.add('active');
+            renderDayTasks(dayKey);
+        }
+
+        // Render tasks for selected day
+        function renderDayTasks(day) {
+            const dayColumn = document.getElementById('currentDayColumn');
+            dayColumn.innerHTML = '';
+            
+            const dayHeader = document.createElement('div');
+            dayHeader.className = 'day-header';
+            dayHeader.textContent = day.charAt(0).toUpperCase() + day.slice(1);
+            dayColumn.appendChild(dayHeader);
+            
+            const addBtn = document.createElement('button');
+            addBtn.className = 'add-task-btn';
+            addBtn.textContent = 'Add Task';
+            addBtn.onclick = () => addTaskForDay(day);
+            dayColumn.appendChild(addBtn);
+            
+            const tasks = (taskPresets[day] || []);
+            
+            if (tasks.length === 0) {
+                const emptyState = document.createElement('div');
+                emptyState.style.textAlign = 'center';
+                emptyState.style.padding = '40px';
+                emptyState.style.color = 'rgba(255, 255, 255, 0.5)';
+                emptyState.innerHTML = `
+                    <div style="font-size: 48px; margin-bottom: 20px;">✅</div>
+                    <div>No tasks yet. Click "Add Task" to create one.</div>
+                `;
+                dayColumn.appendChild(emptyState);
+                return;
+            }
+            
+            tasks.forEach(task => {
+                const taskCard = document.createElement('div');
+                taskCard.className = 'task-card';
+                taskCard.dataset.taskId = task.id;
+                
+                taskCard.innerHTML = `
+                    <div class="task-time">${task.time}</div>
+                    <div class="task-title" contenteditable="true" onblur="saveTask('${task.id}')">${task.title}</div>
+                    <div class="task-resources" contenteditable="true" onblur="saveTask('${task.id}')">${task.resources || ''}</div>
+                    <div class="task-actions">
+                        <div class="task-toggle" onclick="toggleTask('${task.id}')"></div>
+                        <button class="upload-btn" onclick="uploadFile('${task.id}')">Upload</button>
+                    </div>
+                `;
+                
+                if (task.completed) {
+                    taskCard.classList.add('completed');
+                    taskCard.querySelector('.task-toggle').classList.add('active');
+                }
+                
+                dayColumn.appendChild(taskCard);
+            });
+        }
+
+        // Render schedule
+        function renderSchedule() {
+            loadTaskPresets();
+            renderDayTabs();
+            renderDayTasks(getCurrentDay());
+            loadFromStorage();
+        }
+
+        // Memory System Functions
+        function openMemoryModal() {
+            document.getElementById('memoryModal').classList.add('show');
+            loadMemoryData();
+            renderMemoryFolders();
+        }
+
+        function closeMemoryModal() {
+            document.getElementById('memoryModal').classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('memoryModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('memoryModal')) {
+                closeMemoryModal();
+            }
+        });
+
+        function loadMemoryData() {
+            const saved = localStorage.getItem('memoryData');
+            if (saved) {
+                memoryData = JSON.parse(saved);
+            } else {
+                // Initialize with empty folders for each day
+                memoryData = {};
+                scheduleData.schedule.forEach(day => {
+                    memoryData[day.day] = [];
+                });
+            }
+        }
+
+        function saveMemoryData() {
+            localStorage.setItem('memoryData', JSON.stringify(memoryData));
+        }
+
+        function renderMemoryFolders() {
+            const foldersContainer = document.getElementById('memoryFolders');
+            foldersContainer.innerHTML = '';
+
+            Object.keys(memoryData).forEach(day => {
+                const folderDiv = document.createElement('div');
+                folderDiv.className = 'day-folder';
+                
+                const folderHeader = document.createElement('div');
+                folderHeader.className = 'day-folder-header';
+                folderHeader.onclick = (e) => selectMemoryDay(day, e.currentTarget);
+                
+                folderHeader.innerHTML = `
+                    <div class="day-folder-name">${day}</div>
+                    <div class="day-folder-count">${memoryData[day].length} files</div>
+                `;
+                
+                folderDiv.appendChild(folderHeader);
+                foldersContainer.appendChild(folderDiv);
+            });
+        }
+
+        function selectMemoryDay(day, headerEl) {
+            currentMemoryDay = day;
+            document.querySelectorAll('.day-folder-header').forEach(header => {
+                header.classList.remove('active');
+            });
+            if (headerEl) headerEl.classList.add('active');
+            renderMemoryFiles(day);
+        }
+
+        function renderMemoryFiles(day) {
+            const filesContainer = document.getElementById('memoryFiles');
+            const emptyState = document.getElementById('memoryEmpty');
+            
+            if (!memoryData[day] || memoryData[day].length === 0) {
+                filesContainer.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            filesContainer.style.display = 'grid';
+            emptyState.style.display = 'none';
+            filesContainer.innerHTML = '';
+            
+            memoryData[day].forEach((file, index) => {
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'memory-file';
+                fileDiv.onclick = () => openFilePreview(file);
+                
+                const preview = document.createElement('div');
+                preview.className = 'file-preview';
+                
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = file.url;
+                    preview.appendChild(img);
+                } else {
+                    const icon = document.createElement('div');
+                    icon.className = 'file-icon';
+                    icon.textContent = getFileIcon(file.type);
+                    preview.appendChild(icon);
+                }
+                
+                const fileName = document.createElement('div');
+                fileName.className = 'file-name';
+                fileName.textContent = file.name;
+                
+                const fileSize = document.createElement('div');
+                fileSize.className = 'file-size';
+                fileSize.textContent = formatFileSize(file.size);
+                
+                const fileActions = document.createElement('div');
+                fileActions.className = 'file-actions';
+                fileActions.innerHTML = `
+                    <button class="file-delete" onclick="deleteMemoryFile('${day}', ${index})">×</button>
+                `;
+                
+                fileDiv.appendChild(preview);
+                fileDiv.appendChild(fileName);
+                fileDiv.appendChild(fileSize);
+                fileDiv.appendChild(fileActions);
+                
+                filesContainer.appendChild(fileDiv);
+            });
+        }
+
+        function getFileIcon(type) {
+            if (type.startsWith('image/')) return '🖼️';
+            if (type.startsWith('video/')) return '🎥';
+            if (type.startsWith('audio/')) return '🎵';
+            if (type.includes('pdf')) return '📄';
+            if (type.includes('word')) return '📝';
+            if (type.includes('excel') || type.includes('spreadsheet')) return '📊';
+            if (type.includes('powerpoint') || type.includes('presentation')) return '📽️';
+            if (type.includes('zip') || type.includes('rar')) return '📦';
+            return '📄';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function triggerFileUpload() {
+            document.getElementById('memoryFileInput').click();
+        }
+
+        function handleMemoryFileUpload(event) {
+            const files = Array.from(event.target.files);
+            if (files.length === 0) return;
+            
+            if (!currentMemoryDay) {
+                // Select first day if none selected
+                const firstDay = Object.keys(memoryData)[0];
+                selectMemoryDay(firstDay);
+            }
+            
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const fileData = {
+                        name: file.name,
+                        type: file.type,
+                        size: file.size,
+                        url: e.target.result,
+                        date: new Date().toISOString()
+                    };
+                    
+                    if (!memoryData[currentMemoryDay]) {
+                        memoryData[currentMemoryDay] = [];
+                    }
+                    
+                    memoryData[currentMemoryDay].push(fileData);
+                    saveMemoryData();
+                    renderMemoryFiles(currentMemoryDay);
+                    renderMemoryFolders();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function deleteMemoryFile(day, index) {
+            if (confirm('Are you sure you want to delete this file?')) {
+                memoryData[day].splice(index, 1);
+                saveMemoryData();
+                renderMemoryFiles(day);
+                renderMemoryFolders();
+            }
+        }
+
+        function openFilePreview(file) {
+            if (file.type.startsWith('image/')) {
+                window.open(file.url, '_blank');
+            } else {
+                // For other file types, try to download
+                const link = document.createElement('a');
+                link.href = file.url;
+                link.download = file.name;
+                link.click();
+            }
+        }
+
+        // Drag and drop functionality
+        function setupDragAndDrop() {
+            const uploadArea = document.getElementById('uploadArea');
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                
+                const files = Array.from(e.dataTransfer.files);
+                if (files.length > 0) {
+                    // Simulate file input change
+                    const fileInput = document.getElementById('memoryFileInput');
+                    fileInput.files = e.dataTransfer.files;
+                    handleMemoryFileUpload({ target: fileInput });
+                }
+            });
+        }
+
+        // Auto-refresh tasks every minute
+        setInterval(() => {
+            if (currentDay) {
+                renderDayTasks(currentDay);
+            }
+        }, 60000);
+
+        // Initialize after DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+        renderSchedule();
+        setupDragAndDrop();
+                setupNotesEditor();
+                // Ensure memory modal is not covering the UI on load
+                closeMemoryModal();
+            } catch (e) {
+                console.error('Initialization error:', e);
+                alert('Initialization error: ' + (e && e.message ? e.message : e));
+            }
+        });
+
+        // Notes (Notion-like) per day
+        function getNotesKeyForDay(day) {
+            return `notes:${day}`;
+        }
+
+        function loadNotesForDay(day) {
+            const editor = document.getElementById('notesEditor');
+            if (!editor) return;
+            const saved = localStorage.getItem(getNotesKeyForDay(day));
+            editor.innerHTML = saved || '';
+            setNotesStatus('Saved');
+        }
+
+        function saveNotesForDay(day) {
+            const editor = document.getElementById('notesEditor');
+            if (!editor) return;
+            localStorage.setItem(getNotesKeyForDay(day), editor.innerHTML);
+            setNotesStatus('Saved');
+        }
+
+        function setNotesStatus(text) {
+            const el = document.getElementById('notesStatus');
+            if (el) el.textContent = text;
+        }
+
+        function setupNotesEditor() {
+            const editor = document.getElementById('notesEditor');
+            if (!editor) return;
+            editor.addEventListener('input', () => {
+                setNotesStatus('Saving…');
+                if (currentMemoryDay) {
+                    // debounce-lite
+                    clearTimeout(window.__notesSaveT);
+                    window.__notesSaveT = setTimeout(() => saveNotesForDay(currentMemoryDay), 400);
+                }
+            });
+            editor.addEventListener('paste', async (e) => {
+                if (!currentMemoryDay) return;
+                const items = e.clipboardData && e.clipboardData.items;
+                if (!items) return;
+                for (let i = 0; i < items.length; i++) {
+                    const item = items[i];
+                    if (item.type && item.type.indexOf('image') !== -1) {
+                        e.preventDefault();
+                        const blob = item.getAsFile();
+                        if (!blob) continue;
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                            const fileData = {
+                                name: `pasted-${Date.now()}.png`,
+                                type: blob.type || 'image/png',
+                                size: blob.size || 0,
+                                url: ev.target.result,
+                                date: new Date().toISOString()
+                            };
+                            if (!memoryData[currentMemoryDay]) memoryData[currentMemoryDay] = [];
+                            memoryData[currentMemoryDay].push(fileData);
+                            saveMemoryData();
+                            renderMemoryFiles(currentMemoryDay);
+                            renderMemoryFolders();
+                            // insert image into editor
+                            const img = document.createElement('img');
+                            img.src = fileData.url;
+                            img.style.maxWidth = '100%';
+                            const sel = window.getSelection();
+                            if (sel && sel.rangeCount) {
+                                sel.getRangeAt(0).insertNode(img);
+                                sel.collapseToEnd();
+                            } else {
+                                editor.appendChild(img);
+                            }
+                            saveNotesForDay(currentMemoryDay);
+                        };
+                        reader.readAsDataURL(blob);
+                    }
+                }
+            });
+        }
+
+        // Add/Edit Tasks per day
+        function addTaskForDay(day) {
+            if (!taskPresets[day]) taskPresets[day] = [];
+            const newTask = {
+                time: '00:00–00:00',
+                title: 'New Task',
+                resources: '',
+                completed: false,
+                id: `${day.toLowerCase()}-${Math.random().toString(36).substr(2, 9)}`
+            };
+            taskPresets[day].push(newTask);
+            saveTaskPresets();
+            renderDayTasks(day);
+        }
+
+        function enableEditableTimes(container) {
+            container.querySelectorAll('.task-time').forEach(el => {
+                el.contentEditable = 'true';
+                el.addEventListener('blur', () => {
+                    const taskCard = el.closest('.task-card');
+                    const taskId = taskCard && taskCard.dataset.taskId;
+                    if (!taskId) return;
+                    let task = null, dayKey = null;
+                    for (let d in taskPresets) {
+                        const found = taskPresets[d].find(t => t.id === taskId);
+                        if (found) { task = found; dayKey = d; break; }
+                    }
+                    if (task) {
+                        task.time = el.textContent.trim();
+                        saveTaskPresets();
+                    }
+                });
+            });
+        }
+
+        // Hook notes editor when Memory modal opens and a day is selected
+        const _origSelectMemoryDay = selectMemoryDay;
+        selectMemoryDay = function(day, headerEl) {
+            _origSelectMemoryDay(day, headerEl);
+            loadNotesForDay(day);
+        }
+
+        // Hook renderDayTasks to enable editable times
+        const _origRenderDayTasks = renderDayTasks;
+        renderDayTasks = function(day) {
+            _origRenderDayTasks(day);
+            const dayColumn = document.getElementById('currentDayColumn');
+            if (dayColumn) enableEditableTimes(dayColumn);
+        }
+    </script>
+</body>
+</html>
